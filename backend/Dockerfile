@@ -6,6 +6,6 @@ WORKDIR /usr/bin/shortenerBE
 
 RUN go mod tidy
 
-# RUN go build -o /main
+RUN go build -o /main
 
-ENTRYPOINT ["/bin/sh", "-c", "--"]
+ENTRYPOINT ["/main"]
