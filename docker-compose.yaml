@@ -7,3 +7,11 @@ services:
       - ./backend/shortenerBE:/usr/bin/shortenerBE
     ports:
       - 8080:8080
+
+  frontend:
+    image: ${docker_image_FE}:${docker_tag_FE}
+    tty: true 
+    volumes: 
+      - ./froentend/shortenerFE:/usr/bin/shortenerFE
+    ports:
+      - 8081:8081
