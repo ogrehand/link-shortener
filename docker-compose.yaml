@@ -12,6 +12,6 @@ services:
     image: ${docker_image_FE}:${docker_tag_FE}
     tty: true 
     volumes: 
-      - ./froentend/shortenerFE:/usr/bin/shortenerFE
+      - ./froentend/shortener-fe:/usr/bin/shortener-fe
     ports:
-      - 8081:8081
+      - 8081:8080
