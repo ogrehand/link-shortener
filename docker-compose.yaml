@@ -1,8 +1,18 @@
 version: '3'
 services:
+  mongo: 
+    image: mongo
+    container_name: mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${mongo_user}
+      MONGO_INITDB_ROOT_PASSWORD: ${mongo_pass}
+    ports:
+      - 27017:27017
   backend:
     image: ${docker_image_BE}:${docker_tag_BE}
     tty: true 
+    restart: unless-stopped
     volumes: 
       - ./backend/shortenerBE:/usr/bin/shortenerBE
     ports:
@@ -10,8 +20,8 @@ services:
 
   frontend:
     image: ${docker_image_FE}:${docker_tag_FE}
-    tty: true 
+    restart: unless-stopped
     volumes: 
-      - ./froentend/shortener-fe:/usr/bin/shortener-fe
+      - ./frontend/shortener-fe:/usr/bin/shortener-fe
     ports:
       - 8081:8080
