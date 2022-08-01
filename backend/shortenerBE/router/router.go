@@ -6,7 +6,7 @@ import(
 	"fmt"
 )
 
-func router(){
+func Router(){
 	files, err := ioutil.ReadDir("./")
 	if err != nil {
         log.Fatal(err)

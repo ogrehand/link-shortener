@@ -1,4 +1,4 @@
-module Tobing/shortenerBE
+module shortenerBE
 
 go 1.18
 
