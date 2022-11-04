@@ -13,15 +13,15 @@ services:
     image: ${docker_image_BE}:${docker_tag_BE}
     tty: true 
     restart: unless-stopped
-    volumes: 
-      - ./backend/shortenerBE:/usr/bin/shortenerBE
+    # volumes: 
+    #   - ./backend/shortenerBE:/usr/bin/shortenerBE
     ports:
       - 8080:8080
 
-  frontend:
-    image: ${docker_image_FE}:${docker_tag_FE}
-    restart: unless-stopped
-    volumes: 
-      - ./frontend/shortener-fe:/usr/bin/shortener-fe
-    ports:
-      - 8081:8080
+  # frontend:
+  #   image: ${docker_image_FE}:${docker_tag_FE}
+  #   restart: unless-stopped
+  #   volumes: 
+  #     - ./frontend/shortener-fe:/usr/bin/shortener-fe
+  #   ports:
+  #     - 8081:8080

@@ -17,37 +17,63 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"github.com/gin-contrib/static"
 	// "go.mongodb.org/mongo-driver/mongo/readpref"
 )
 
+// func proxy(c *gin.Context) {
+
+// 	remote, err := url.Parse("http://link-shortener-frontend-1:8080")
+// 	if err != nil {
+// 		panic(err)
+// 	}
+// 	// proxy := httputil.NewSingleHostReverseProxy(remote)
+
+// 	director := func(req *http.Request) {
+// 		fmt.Println("disini   ")
+// 		fmt.Println(c.Request.Header)
+
+// 		fmt.Println("    disini")
+// 		// req.Header = c.Request.Header
+// 		// req.Host = remote.Host
+// 		req.URL.Scheme = remote.Scheme
+// 		req.URL.Host = remote.Host
+// 		req.URL.Path = remote.Path
+// 	}
+// 	proxy := &httputil.ReverseProxy{Director: director}
+// 	proxy.ServeHTTP(c.Writer, c.Request)
+// }
+
 func proxy(c *gin.Context) {
+    remote, err := url.Parse("http://link-shortener-frontend-1:8080")
+    if err != nil {
+        panic(err)
+    }
 
-	remote, err := url.Parse("http://link-shortener-frontend-1:8080")
-	if err != nil {
-		panic(err)
-	}
-	// proxy := httputil.NewSingleHostReverseProxy(remote)
-
-	director := func(req *http.Request) {
-		fmt.Println("disini   ")
+    proxy := httputil.NewSingleHostReverseProxy(remote)
+    proxy.Director = func(req *http.Request) {
 		fmt.Println(c.Request.Header)
+		fmt.Println(remote.Host)
+		fmt.Println(remote.Scheme)
+		fmt.Println(remote.Host)
+		fmt.Println(remote.Path)
+        req.Header = c.Request.Header
+        req.Host = remote.Host
+        req.URL.Scheme = remote.Scheme
+        req.URL.Host = remote.Host
+        req.URL.Path = remote.Path
+    }
 
-		fmt.Println("    disini")
-		// req.Header = c.Request.Header
-		// req.Host = remote.Host
-		req.URL.Scheme = remote.Scheme
-		req.URL.Host = remote.Host
-		req.URL.Path = remote.Path
-	}
-	proxy := &httputil.ReverseProxy{Director: director}
-	proxy.ServeHTTP(c.Writer, c.Request)
+    proxy.ServeHTTP(c.Writer, c.Request)
 }
 
 func main() {
 	r := gin.Default()
 
-	r.GET("/proxyPath", proxy)
-	r.GET("/js/*any", proxy)
+	// r.GET("/123", proxy)
+	// r.GET("/js/*any", proxy)
+	r.Use(static.Serve("/", static.LocalFile("./views", false)))
+	
 	router.RouteV1(r)
 	r.GET("/ping", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{

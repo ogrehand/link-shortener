@@ -5,7 +5,7 @@ import(
 	"log"
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"net/http"
+	// "net/http"
 )
 
 func RouteV1(router *gin.Engine){
@@ -46,9 +46,9 @@ func RouteV1(router *gin.Engine){
 			})
 		}
 	}
-	router.GET(":id",func(c *gin.Context){
-		c.Redirect(http.StatusMovedPermanently, "http://www.google.com/")
-	})
+	// router.GET(":id",func(c *gin.Context){
+	// 	c.Redirect(http.StatusMovedPermanently, "http://www.google.com/")
+	// })
 }
 
 func Terserah(apa string){
