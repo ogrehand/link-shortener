@@ -9,7 +9,7 @@ import (
 	"fmt"
 	"log"
 	"time"
-	// "io/ioutil"
+	"io/ioutil"
 	// "bytes"
 
 	"github.com/gin-gonic/gin"
@@ -72,8 +72,9 @@ func main() {
 
 	// r.GET("/123", proxy)
 	// r.GET("/js/*any", proxy)
-	r.Use(static.Serve("/", static.LocalFile("./views", false)))
 	
+
+	r.Use(static.Serve("/", static.LocalFile("./views", true)))
 	router.RouteV1(r)
 	r.GET("/ping", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
@@ -123,6 +124,24 @@ func main() {
 		})
 
 	})
+
+	r.NoRoute(func(ctx *gin.Context) {
+        file, _ := ioutil.ReadFile("./views/index.html")
+        // etag := fmt.Sprintf("%x", md5.Sum(file)) //nolint:gosec
+        // ctx.Header("ETag", etag)
+        ctx.Header("Cache-Control", "no-cache")
+
+        // if match := ctx.GetHeader("If-None-Match"); match != "" {
+        //     if strings.Contains(match, etag) {
+        //         ctx.Status(http.StatusNotModified)
+
+        //         //這裡若沒 return 的話，會執行到 ctx.Data
+        //         return
+        //     }
+        // }
+
+        ctx.Data(http.StatusOK, "text/html; charset=utf-8", file)
+    })
 
 	r.Run() // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
 }
