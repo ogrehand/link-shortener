@@ -1,0 +1,22 @@
+user: {
+    _id: random generated id
+    full_name: full name
+    username: username (4-16 string)
+    salt: salt generated random
+    password: hashed password
+    status: status of the user, if inactive user cant login and need to activate again this email
+
+}
+
+link:{
+    _id: setup id/generated one
+    real_link: real link that will be shortened
+    author: id of the author
+    collaborator:[
+        list of collaborator:{
+            id_collaborator: collaborator id
+            collaborator_role: role of the collaborator{editor,viewer}
+        }
+    ]
+    status: status of the link whether its active(can be used) or inactive(cannot be used)
+}

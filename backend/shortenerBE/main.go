@@ -14,6 +14,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"shortenerBE/router"
+	"shortenerBE/helper"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -77,6 +78,7 @@ func main() {
 	r.Use(static.Serve("/", static.LocalFile("./views", true)))
 	router.RouteV1(r)
 	r.GET("/ping", func(c *gin.Context) {
+		fmt.Println(helper.GenerateHash())
 		c.JSON(http.StatusOK, gin.H{
 			"message": "pong",
 		})
