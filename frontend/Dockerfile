@@ -1,8 +1,8 @@
 FROM node:lts-alpine3.15
 
-COPY ./shortenerFE /usr/bin/
+COPY ./shortener-fe /usr/bin/
 
-WORKDIR /usr/bin/shortenerFE
+WORKDIR /usr/bin/shortener-fe
 
 RUN npm install
 
