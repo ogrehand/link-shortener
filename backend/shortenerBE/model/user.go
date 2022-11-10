@@ -3,7 +3,6 @@ package model
 import (
 	"context"
 	"fmt"
-	"os"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -18,37 +17,71 @@ func AddUser(full_name string, username string, salt string, hashed_password str
 
 	// mongo.Connect return mongo.Client method
 	client, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb://bukanroot:bukanroot@mongo:27017"))
-	fmt.Println(client, ctx, cancel, err, os.Getenv("FOO"))
+	fmt.Println(client, ctx, cancel, err)
 
 	usersCollection := client.Database("test").Collection("user")
-	user := bson.D{{"fullName", full_name}, {"username", username}, {"salt", salt}, {"password", hashed_password}, {"status", true}}
+	user := bson.D{{"_id", username},
+		{"full_name", full_name},
+		{"salt", salt},
+		{"password", hashed_password},
+		{"created_at", time.Now()},
+		{"status", true},
+		{"token", bson.A{}}}
 	// user := bson.D{{"fullName", "User 1"}, {"age", 30}}
 	// insert the bson object using InsertOne()
 	result, err := usersCollection.InsertOne(context.TODO(), user)
 	// check for errors in the insertion
 	if err != nil {
-		panic(err)
+		fmt.Println(mongo.IsDuplicateKeyError(err))
+		fmt.Println(err.Error())
+		panic(err.Error())
+
 	}
 	// display the id of the newly inserted object
 	fmt.Println(result.InsertedID)
 }
+func Login(username string, password string, token string) {
+	ctx, _ := context.WithTimeout(context.Background(),
+		30*time.Second)
 
-func GetUserbyWTf() {
+	// mongo.Connect return mongo.Client method
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb://bukanroot:bukanroot@mongo:27017"))
+	usersCollection := client.Database("test").Collection("user")
+	user := bson.D{{"_id", username},
+		{"password", password}}
+	// user := bson.D{{"fullName", "User 1"}, {"age", 30}}
+	// insert the bson object using InsertOne()
+	// need to find how to use this method
+	result, err := usersCollection.UpdateOne(context.TODO(), user, user)
+	// check for errors in the insertion
+	if err != nil {
+		fmt.Println(mongo.IsDuplicateKeyError(err))
+		fmt.Println(err.Error())
+		fmt.Println(result)
+		panic(err.Error())
+	}
+}
+
+func GetUserbyID(username string) {
 	ctx, cancel := context.WithTimeout(context.Background(),
 		30*time.Second)
 
 	// mongo.Connect return mongo.Client method
 	client, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb://bukanroot:bukanroot@mongo:27017"))
-	fmt.Println(client, ctx, cancel, err, os.Getenv("FOO"))
+	fmt.Println(client, ctx, cancel, err)
 
-	usersCollection := client.Database("test").Collection("sample2")
-	user := bson.D{{"fullName", "User 1"}, {"age", 30}}
+	var userData bson.D
+
+	usersCollection := client.Database("test").Collection("user")
+	// user := bson.D{{}}
+	// user := bson.M{"_id": username}
 	// insert the bson object using InsertOne()
-	result, err := usersCollection.InsertOne(context.TODO(), user)
+	usersCollection.FindOne(context.TODO(), bson.M{"_id": username}).Decode(&userData)
 	// check for errors in the insertion
-	if err != nil {
-		panic(err)
-	}
+	// if result != nil {
+	// 	panic(result)
+	// }
 	// display the id of the newly inserted object
-	fmt.Println(result.InsertedID)
+	fmt.Println("Adad")
+	fmt.Println(userData)
 }

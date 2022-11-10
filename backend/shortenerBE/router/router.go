@@ -17,19 +17,17 @@ import (
 // 	Price  float64 `json:"price"`
 // }
 
+type user struct {
+	Fullname string `json:"fullname"`
+	Username string `json:"username"`
+	Password string `json:"password"`
+}
+
 func RouteV1(router *gin.Engine) {
 	v1 := router.Group("/v1")
 	{
 		users := v1.Group("/users")
 		{
-			users.POST("/register", func(c *gin.Context) {
-
-				fmt.Println("terserah")
-				fmt.Println(ioutil.ReadAll(c.Request.Body))
-				fmt.Println("terserah")
-				controller.Register("Asdas", "adasdas", "asdasdasd")
-				fmt.Println("terserah")
-			})
 			users.POST("/login", func(c *gin.Context) {
 				fmt.Println("terserah")
 			})
@@ -37,10 +35,25 @@ func RouteV1(router *gin.Engine) {
 				fmt.Println("terserah 2")
 			})
 			users.GET("/:id", func(c *gin.Context) {
-				fmt.Println("terserah 3")
+				controller.GetUserbyID(c.Param("id"))
 			})
-			users.PUT("/:id", func(c *gin.Context) {
-				fmt.Println("terserah 3")
+			users.PUT("/", func(c *gin.Context) {
+				var userData user
+				if err := c.BindJSON(&userData); err != nil {
+					fmt.Println(err.Error())
+				}
+				controller.Register(userData.Fullname,
+					userData.Username,
+					userData.Password)
+				/**
+				best way to print struct instance
+				fmt.Printf("%+v\n", userData)
+				fmt.Println(userData.Password)
+				*/
+				// res2B, _ := json.Marshal(userData)
+				// fmt.Println(string(res2B))
+				// controller.Register("Asdas", "adasdas", "asdasdasd")
+				// fmt.Println("terserah")
 			})
 			users.POST("/:id", func(c *gin.Context) {
 				fmt.Println("terserah 3")

@@ -4,8 +4,14 @@ user: {
     username: username (4-16 string)
     salt: salt generated random
     password: hashed password
+    created_at: date when this account created
     status: status of the user, if inactive user cant login and need to activate again this email
-
+    token: [
+        {token_key: random char 16,
+        IP/identifier: on progress to find perfect candidate and how to collect this data
+        created_at: will auto destroy on 5 days
+        }
+    ]
 }
 
 link:{
