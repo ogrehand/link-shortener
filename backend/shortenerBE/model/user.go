@@ -64,7 +64,17 @@ func Login(username string, password string, token string) {
 	}
 }
 
-func GetUserbyID(username string) bson.D {
+type user struct {
+	Fullname   string    `json:"fullname" bson:"full_name,omitempty"`
+	Username   string    `bson:"_id,omitempty" json:"username"`
+	Email      string    `json:"email" bson:"email,omitempty"`
+	Password   string    `json:"password" bson:"password,omitempty"`
+	Salt       string    `json:"salt" bson:"salt,omitempty"`
+	Created_at time.Time `json:"created_at" bson:"created_at,omitempty"`
+	Status     bool      `json:"status" bson:"status,omitempty"`
+}
+
+func GetUserbyID(username string) user {
 	ctx, cancel := context.WithTimeout(context.Background(),
 		30*time.Second)
 
@@ -75,17 +85,10 @@ func GetUserbyID(username string) bson.D {
 	var userData bson.D
 
 	usersCollection := client.Database("test").Collection("user")
-	// user := bson.D{{}}
-	// user := bson.M{"_id": username}
-	// insert the bson object using InsertOne()
 	usersCollection.FindOne(context.TODO(), bson.M{"_id": username}).Decode(&userData)
-	// check for errors in the insertion
-	// if result != nil {
-	// 	panic(result)
-	// }
-	// display the id of the newly inserted object
-	fmt.Println("Adad")
-	fmt.Println(userData)
-	// jsonUser, _ := json.Marshal(userData)
-	return userData
+
+	jsonUser, _ := bson.Marshal(userData)
+	var userJson user
+	err = bson.Unmarshal(jsonUser, &userJson)
+	return userJson
 }

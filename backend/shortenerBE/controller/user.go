@@ -16,7 +16,7 @@ type user struct {
 	Password string `json:"password"`
 }
 
-func Login(username string, password string) {
+func Login(c *gin.Context) {
 
 }
 

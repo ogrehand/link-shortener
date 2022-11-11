@@ -1,71 +1,45 @@
 package main
 
 import (
-	"net/http"
-	"net/url"
-	"net/http/httputil"
-
 	"context"
 	"fmt"
-	"log"
-	"time"
 	"io/ioutil"
-	// "bytes"
-
-	"github.com/gin-gonic/gin"
-	"shortenerBE/router"
+	"log"
+	"net/http"
+	"net/http/httputil"
+	"net/url"
 	"shortenerBE/helper"
+	"shortenerBE/router"
+	"time"
+
+	"github.com/gin-contrib/static"
+	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	"github.com/gin-contrib/static"
-	// "go.mongodb.org/mongo-driver/mongo/readpref"
 )
 
-// func proxy(c *gin.Context) {
-
-// 	remote, err := url.Parse("http://link-shortener-frontend-1:8080")
-// 	if err != nil {
-// 		panic(err)
-// 	}
-// 	// proxy := httputil.NewSingleHostReverseProxy(remote)
-
-// 	director := func(req *http.Request) {
-// 		fmt.Println("disini   ")
-// 		fmt.Println(c.Request.Header)
-
-// 		fmt.Println("    disini")
-// 		// req.Header = c.Request.Header
-// 		// req.Host = remote.Host
-// 		req.URL.Scheme = remote.Scheme
-// 		req.URL.Host = remote.Host
-// 		req.URL.Path = remote.Path
-// 	}
-// 	proxy := &httputil.ReverseProxy{Director: director}
-// 	proxy.ServeHTTP(c.Writer, c.Request)
-// }
-
 func proxy(c *gin.Context) {
-    remote, err := url.Parse("http://link-shortener-frontend-1:8080")
-    if err != nil {
-        panic(err)
-    }
+	remote, err := url.Parse("http://link-shortener-frontend-1:8080")
+	if err != nil {
+		panic(err)
+	}
 
-    proxy := httputil.NewSingleHostReverseProxy(remote)
-    proxy.Director = func(req *http.Request) {
+	proxy := httputil.NewSingleHostReverseProxy(remote)
+	proxy.Director = func(req *http.Request) {
 		fmt.Println(c.Request.Header)
 		fmt.Println(remote.Host)
 		fmt.Println(remote.Scheme)
 		fmt.Println(remote.Host)
 		fmt.Println(remote.Path)
-        req.Header = c.Request.Header
-        req.Host = remote.Host
-        req.URL.Scheme = remote.Scheme
-        req.URL.Host = remote.Host
-        req.URL.Path = remote.Path
-    }
+		req.Header = c.Request.Header
+		req.Host = remote.Host
+		req.URL.Scheme = remote.Scheme
+		req.URL.Host = remote.Host
+		req.URL.Path = remote.Path
+	}
 
-    proxy.ServeHTTP(c.Writer, c.Request)
+	proxy.ServeHTTP(c.Writer, c.Request)
 }
 
 func main() {
@@ -73,12 +47,11 @@ func main() {
 
 	// r.GET("/123", proxy)
 	// r.GET("/js/*any", proxy)
-	
 
 	r.Use(static.Serve("/", static.LocalFile("./views", true)))
 	router.RouteV1(r)
 	r.GET("/ping", func(c *gin.Context) {
-		fmt.Println(helper.GenerateHash())
+		fmt.Println(helper.GenerateSalt())
 		c.JSON(http.StatusOK, gin.H{
 			"message": "pong",
 		})
@@ -128,22 +101,13 @@ func main() {
 	})
 
 	r.NoRoute(func(ctx *gin.Context) {
-        file, _ := ioutil.ReadFile("./views/index.html")
-        // etag := fmt.Sprintf("%x", md5.Sum(file)) //nolint:gosec
-        // ctx.Header("ETag", etag)
-        ctx.Header("Cache-Control", "no-cache")
+		file, _ := ioutil.ReadFile("./views/index.html")
+		// etag := fmt.Sprintf("%x", md5.Sum(file)) //nolint:gosec
+		// ctx.Header("ETag", etag)
+		ctx.Header("Cache-Control", "no-cache")
 
-        // if match := ctx.GetHeader("If-None-Match"); match != "" {
-        //     if strings.Contains(match, etag) {
-        //         ctx.Status(http.StatusNotModified)
-
-        //         //這裡若沒 return 的話，會執行到 ctx.Data
-        //         return
-        //     }
-        // }
-
-        ctx.Data(http.StatusOK, "text/html; charset=utf-8", file)
-    })
+		ctx.Data(http.StatusOK, "text/html; charset=utf-8", file)
+	})
 
 	r.Run() // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
 }
