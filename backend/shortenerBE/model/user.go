@@ -11,7 +11,8 @@ import (
 	// "go.mongodb.org/mongo-driver/mongo/readpref"
 )
 
-func AddUser(full_name string, username string, salt string, hashed_password string) {
+func AddUser(full_name string, username string, email string,
+	salt string, hashed_password string) {
 	ctx, cancel := context.WithTimeout(context.Background(),
 		30*time.Second)
 
@@ -22,6 +23,7 @@ func AddUser(full_name string, username string, salt string, hashed_password str
 	usersCollection := client.Database("test").Collection("user")
 	user := bson.D{{"_id", username},
 		{"full_name", full_name},
+		{"email", email},
 		{"salt", salt},
 		{"password", hashed_password},
 		{"created_at", time.Now()},
@@ -62,7 +64,7 @@ func Login(username string, password string, token string) {
 	}
 }
 
-func GetUserbyID(username string) {
+func GetUserbyID(username string) bson.D {
 	ctx, cancel := context.WithTimeout(context.Background(),
 		30*time.Second)
 
@@ -84,4 +86,6 @@ func GetUserbyID(username string) {
 	// display the id of the newly inserted object
 	fmt.Println("Adad")
 	fmt.Println(userData)
+	// jsonUser, _ := json.Marshal(userData)
+	return userData
 }

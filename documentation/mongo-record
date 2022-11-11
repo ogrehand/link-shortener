@@ -1,7 +1,7 @@
 user: {
-    _id: random generated id
+    _id: username (4-16 string)
     full_name: full name
-    username: username (4-16 string)
+    email: email of the user
     salt: salt generated random
     password: hashed password
     created_at: date when this account created
