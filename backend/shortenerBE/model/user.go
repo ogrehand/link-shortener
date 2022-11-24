@@ -12,7 +12,7 @@ import (
 )
 
 func AddUser(full_name string, username string, email string,
-	salt string, hashed_password string) {
+	salt string, hashed_password string) error {
 	ctx, cancel := context.WithTimeout(context.Background(),
 		30*time.Second)
 
@@ -36,11 +36,13 @@ func AddUser(full_name string, username string, email string,
 	if err != nil {
 		fmt.Println(mongo.IsDuplicateKeyError(err))
 		fmt.Println(err.Error())
-		panic(err.Error())
+		// panic(err.Error())
+		return err
 
 	}
 	// display the id of the newly inserted object
 	fmt.Println(result.InsertedID)
+	return nil
 }
 func Login(username string, password string, token string) {
 	ctx, _ := context.WithTimeout(context.Background(),

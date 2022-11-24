@@ -46,9 +46,15 @@ func Register(c *gin.Context) {
 			"message": err.Error(),
 		})
 	}
-	model.AddUser(userData.Fullname, userData.Username, userData.Email, salt, hashed_password)
-	c.JSON(http.StatusOK, gin.H{
-		"message": "created successfully",
-	})
+	errDb := model.AddUser(userData.Fullname, userData.Username, userData.Email, salt, hashed_password)
+	if errDb != nil {
+		c.JSON(http.StatusConflict, gin.H{
+			"message": errDb.Error(),
+		})
+	} else {
+		c.JSON(http.StatusOK, gin.H{
+			"message": "created successfully",
+		})
+	}
 
 }
