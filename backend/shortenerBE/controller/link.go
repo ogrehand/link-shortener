@@ -9,39 +9,30 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type user struct {
-	Fullname string `json:"fullname"`
-	Username string `json:"username"`
-	Email    string `json:"email"`
-	Password string `json:"password"`
+type collaborator struct {
+	CollaboratorId string `json:"collaborator"`
+	Role           int    `json:"role"`
+}
+type link struct {
+	Id           string `json:"shorturl"`
+	RealLink     string `json:"realLink"`
+	Collaborator []*collaborator
 }
 
-func Login(c *gin.Context) {
-
+func RandomRoute(c *gin.Context) {
+	id := c.Param("id")
+	c.Redirect(http.StatusMovedPermanently, "http://www.google.com/"+id)
 }
 
-func Logout(c *gin.Context) {
-
+func DeleteLink(c *gin.Context) {
+	c.Redirect(http.StatusMovedPermanently, "http://www.google.com/")
 }
 
-func GetUserbyID(c *gin.Context) {
-	c.JSON(http.StatusOK, model.GetUserbyID(c.Param("id")))
-}
-
-func Register(c *gin.Context) {
+func AddLink(c *gin.Context) {
 	var userData user
 	if err := c.BindJSON(&userData); err != nil {
 		fmt.Println(err.Error())
 	}
-	/**
-	best way to print struct instance
-	fmt.Printf("%+v\n", userData)
-	fmt.Println(userData.Password)
-	*/
-	// res2B, _ := json.Marshal(userData)
-	// fmt.Println(string(res2B))
-	// controller.Register("Asdas", "adasdas", "asdasdasd")
-	// fmt.Println("terserah")
 	salt := helper.GenerateSalt()
 	hashed_password, err := helper.EncryptPassword(salt, userData.Password)
 	// err.Error() to get error message
@@ -60,5 +51,4 @@ func Register(c *gin.Context) {
 			"message": "created successfully",
 		})
 	}
-
 }

@@ -12,6 +12,11 @@ import (
 	// "go.mongodb.org/mongo-driver/mongo/readpref"
 )
 
+func GenerateURI() string {
+	return "mongodb://" + os.Getenv("user_db") + ":" + os.Getenv("pass_db") +
+		"@" + os.Getenv("hostname") + ":" + os.Getenv("port")
+}
+
 func Getdata() {
 	ctx, cancel := context.WithTimeout(context.Background(),
 		30*time.Second)

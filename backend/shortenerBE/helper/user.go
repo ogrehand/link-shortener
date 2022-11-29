@@ -21,3 +21,7 @@ func GenerateSalt() string {
 	}
 	return string(b)
 }
+
+func CheckToken(id string) {
+
+}

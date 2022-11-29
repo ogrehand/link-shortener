@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"net/url"
+	"os"
 	"shortenerBE/helper"
 	"shortenerBE/router"
 	"time"
@@ -52,6 +53,8 @@ func main() {
 	router.RouteV1(r)
 	r.GET("/ping", func(c *gin.Context) {
 		fmt.Println(helper.GenerateSalt())
+
+		fmt.Println(os.Getenv("user_db"))
 		c.JSON(http.StatusOK, gin.H{
 			"message": "pong",
 		})

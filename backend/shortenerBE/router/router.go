@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"net/http"
 	"shortenerBE/controller"
+	"shortenerBE/model"
 
 	"github.com/gin-gonic/gin"
 )
@@ -50,9 +52,12 @@ func RouteV1(router *gin.Engine) {
 			})
 		}
 	}
-	// router.GET(":id",func(c *gin.Context){
-	// 	c.Redirect(http.StatusMovedPermanently, "http://www.google.com/")
-	// })
+	router.GET("/dbdicoba", func(ctx *gin.Context) {
+		ctx.JSON(http.StatusOK, gin.H{
+			"message": model.GenerateURI(),
+		})
+	})
+	router.GET(":id", controller.RandomRoute)
 }
 
 func Terserah(apa string) {
