@@ -17,7 +17,7 @@ func AddUser(full_name string, username string, email string,
 		30*time.Second)
 
 	// mongo.Connect return mongo.Client method
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb://bukanroot:bukanroot@mongo:27017"))
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI(GenerateURI()))
 	fmt.Println(client, ctx, cancel, err)
 
 	usersCollection := client.Database("test").Collection("user")
@@ -45,11 +45,7 @@ func AddUser(full_name string, username string, email string,
 	return nil
 }
 func Login(username string, password string, token string) {
-	ctx, _ := context.WithTimeout(context.Background(),
-		30*time.Second)
-
-	// mongo.Connect return mongo.Client method
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb://bukanroot:bukanroot@mongo:27017"))
+	client, err := ConnectDB()
 	usersCollection := client.Database("test").Collection("user")
 	user := bson.D{{"_id", username},
 		{"password", password}}
@@ -81,7 +77,7 @@ func GetUserbyID(username string) user {
 		30*time.Second)
 
 	// mongo.Connect return mongo.Client method
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb://bukanroot:bukanroot@mongo:27017"))
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI(GenerateURI()))
 	fmt.Println(client, ctx, cancel, err)
 
 	var userData bson.D

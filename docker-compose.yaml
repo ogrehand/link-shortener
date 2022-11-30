@@ -17,6 +17,8 @@ services:
     #   - ./backend/shortenerBE:/usr/bin/shortenerBE
     ports:
       - 8080:8080
+    env_file:
+      - shared.env
 
   # frontend:
   #   image: ${docker_image_FE}:${docker_tag_FE}

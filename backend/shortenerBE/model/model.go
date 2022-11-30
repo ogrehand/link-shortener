@@ -17,12 +17,23 @@ func GenerateURI() string {
 		"@" + os.Getenv("hostname") + ":" + os.Getenv("port")
 }
 
+func ConnectDB() (*mongo.Collection, error) {
+	ctx, _ := context.WithTimeout(context.Background(),
+		30*time.Second)
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI(GenerateURI()))
+	if err != nil {
+		return nil, err
+	} else {
+		return client.Database("test").Collection(os.Getenv("database")), nil
+	}
+}
+
 func Getdata() {
 	ctx, cancel := context.WithTimeout(context.Background(),
 		30*time.Second)
 
 	// mongo.Connect return mongo.Client method
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb://bukanroot:bukanroot@mongo:27017"))
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI(GenerateURI()))
 	fmt.Println(client, ctx, cancel, err, os.Getenv("FOO"))
 
 	usersCollection := client.Database("test").Collection("sample2")
