@@ -17,14 +17,14 @@ func GenerateURI() string {
 		"@" + os.Getenv("hostname") + ":" + os.Getenv("port")
 }
 
-func ConnectDB() (*mongo.Collection, error) {
+func ConnectDB(collection string) (*mongo.Collection, error) {
 	ctx, _ := context.WithTimeout(context.Background(),
 		30*time.Second)
 	client, err := mongo.Connect(ctx, options.Client().ApplyURI(GenerateURI()))
 	if err != nil {
 		return nil, err
 	} else {
-		return client.Database("test").Collection(os.Getenv("database")), nil
+		return client.Database(os.Getenv("database")).Collection(collection), nil
 	}
 }
 

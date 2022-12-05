@@ -4,9 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
-	"net/http"
 	"shortenerBE/controller"
-	"shortenerBE/model"
 
 	"github.com/gin-gonic/gin"
 )
@@ -27,12 +25,8 @@ func RouteV1(router *gin.Engine) {
 			users.POST("/:id", func(c *gin.Context) {
 				fmt.Println("terserah 3")
 			})
-			users.POST("/login", func(c *gin.Context) {
-				fmt.Println("terserah")
-			})
-			users.POST("/logout", func(c *gin.Context) {
-				fmt.Println("terserah 2")
-			})
+			users.POST("/login", controller.Login)
+			users.POST("/logout", controller.Logout)
 
 		}
 
@@ -52,16 +46,12 @@ func RouteV1(router *gin.Engine) {
 			})
 		}
 	}
-	router.GET("/dbdicoba", func(ctx *gin.Context) {
-		ctx.JSON(http.StatusOK, gin.H{
-			"message": model.GenerateURI(),
-		})
-	})
+	// router.GET("/dbdicoba", func(ctx *gin.Context) {
+	// 	ctx.JSON(http.StatusOK, gin.H{
+	// 		"message": model.GenerateURI(),
+	// 	})
+	// })
 	router.GET(":id", controller.RandomRoute)
-}
-
-func Terserah(apa string) {
-	fmt.Println(apa)
 }
 
 func Router() {
