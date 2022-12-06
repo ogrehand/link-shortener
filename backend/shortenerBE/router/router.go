@@ -53,7 +53,7 @@ func RouteV1(router *gin.Engine) {
 	// 		"message": model.GenerateURI(),
 	// 	})
 	// })
-	router.GET(":id", controller.RandomRoute)
+	router.GET(":id", controller.Redirect)
 }
 
 func Router() {

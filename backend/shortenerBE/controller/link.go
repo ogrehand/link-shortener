@@ -2,6 +2,7 @@ package controller
 
 import (
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"shortenerBE/helper"
 	"shortenerBE/model"
@@ -17,6 +18,18 @@ type link struct {
 	Id           string `json:"shorturl"`
 	RealLink     string `json:"realLink"`
 	Collaborator []*collaborator
+}
+
+func Redirect(c *gin.Context) {
+	id := c.Param("id")
+	linkObj := model.GetLink(id)
+	if linkObj.Status {
+		c.Redirect(http.StatusMovedPermanently, linkObj.RealLink)
+	} else {
+		file, _ := ioutil.ReadFile("./views/index.html")
+		c.Header("Cache-Control", "no-cache")
+		c.Data(http.StatusOK, "text/html; charset=utf-8", file)
+	}
 }
 
 func RandomRoute(c *gin.Context) {
