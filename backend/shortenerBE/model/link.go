@@ -3,53 +3,55 @@ package model
 import (
 	"context"
 	"fmt"
-	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 	// "go.mongodb.org/mongo-driver/mongo/readpref"
 )
 
-func GetLink(id string) (*mongo.SingleResult, error) {
-	ctx, cancel := context.WithTimeout(context.Background(),
-		30*time.Second)
+type Collaborator struct {
+	CollaboratorId string `bson:"collab_id"`
+	Role           string `bson:"role"`
+}
 
-	// mongo.Connect return mongo.Client method
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb://bukanroot:bukanroot@mongo:27017"))
-	fmt.Println(client, ctx, cancel, err)
+type Link struct {
+	ShortLink    string         `bson:"_id"`
+	RealLink     string         `bson:"real_link"`
+	Author       string         `bson:"author"`
+	Status       bool           `bson:"status"`
+	Collaborator []Collaborator `bson:"collaborators"`
+}
 
-	linksCollection := client.Database("test").Collection("link")
-	hasil := linksCollection.FindOne(context.TODO(), bson.M{"_id": id})
-	return hasil, nil
+func GetLink(id string) *Link {
+
+	linksCollection, err := ConnectDB("link")
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+	var linkObj Link
+
+	linksCollection.FindOne(context.TODO(), bson.M{"_id": id}).Decode(&linkObj)
+	fmt.Println(linkObj.RealLink)
+	return &linkObj
 
 }
-func AddLink(full_name string, username string, email string,
-	salt string, hashed_password string) error {
-	ctx, cancel := context.WithTimeout(context.Background(),
-		30*time.Second)
 
-	// mongo.Connect return mongo.Client method
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb://bukanroot:bukanroot@mongo:27017"))
-	fmt.Println(client, ctx, cancel, err)
+func AddLink(shortlink string, reallink string, author string,
+	status bool, collaborators []Collaborator) error {
 
-	usersCollection := client.Database("test").Collection("user")
-	user := bson.D{{"_id", username},
-		{"full_name", full_name},
-		{"email", email},
-		{"salt", salt},
-		{"password", hashed_password},
-		{"created_at", time.Now()},
-		{"status", true},
-		{"token", bson.A{}}}
-	// user := bson.D{{"fullName", "User 1"}, {"age", 30}}
-	// insert the bson object using InsertOne()
-	result, err := usersCollection.InsertOne(context.TODO(), user)
-	// check for errors in the insertion
+	linksCollection, err := ConnectDB("link")
+	if err != nil {
+		fmt.Println(err.Error())
+		return err
+
+	}
+
+	linkObj := Link{shortlink, reallink, author, status, collaborators}
+	result, err := linksCollection.InsertOne(context.TODO(), linkObj)
+
 	if err != nil {
 		fmt.Println(mongo.IsDuplicateKeyError(err))
 		fmt.Println(err.Error())
-		// panic(err.Error())
 		return err
 
 	}

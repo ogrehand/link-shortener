@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"log"
 	"shortenerBE/controller"
+	"shortenerBE/model"
 
 	"github.com/gin-gonic/gin"
 )
@@ -33,7 +34,8 @@ func RouteV1(router *gin.Engine) {
 		links := v1.Group("/links")
 		{
 			links.PUT("/", func(c *gin.Context) {
-				fmt.Println("terserah 2")
+				var collaborators []model.Collaborator
+				model.AddLink("asd", "https://google.com", "tralala23", true, collaborators)
 			})
 			links.GET("/", func(c *gin.Context) {
 				fmt.Println("terserah 2")
@@ -42,7 +44,7 @@ func RouteV1(router *gin.Engine) {
 				fmt.Println("links 1")
 			})
 			links.GET("/:id", func(c *gin.Context) {
-				fmt.Println("terserah 3")
+				fmt.Printf("%+v\n", model.GetLink(c.Param("id")))
 			})
 		}
 	}
