@@ -1,23 +1,17 @@
 package controller
 
 import (
-	"fmt"
 	"io/ioutil"
 	"net/http"
-	"shortenerBE/helper"
 	"shortenerBE/model"
 
 	"github.com/gin-gonic/gin"
 )
 
-type collaborator struct {
-	CollaboratorId string `json:"collaborator"`
-	Role           int    `json:"role"`
-}
-type link struct {
-	Id           string `json:"shorturl"`
-	RealLink     string `json:"realLink"`
-	Collaborator []*collaborator
+func GetLink(c *gin.Context) {
+	id := c.Param("id")
+	linkObj := model.GetLink(id)
+	c.JSON(http.StatusOK, linkObj)
 }
 
 func Redirect(c *gin.Context) {
@@ -32,29 +26,18 @@ func Redirect(c *gin.Context) {
 	}
 }
 
-func RandomRoute(c *gin.Context) {
+func DeleteLink(c *gin.Context) {
 	id := c.Param("id")
-	c.Redirect(http.StatusMovedPermanently, "http://www.google.com/"+id)
+	model.EditLink(nil, id, true)
 }
 
-func DeleteLink(c *gin.Context) {
-	c.Redirect(http.StatusMovedPermanently, "http://www.google.com/")
+func UpdateLink(c *gin.Context) {
+	id := c.Param("id")
+	model.EditLink(c.BindJSON, id, false)
 }
 
 func AddLink(c *gin.Context) {
-	var userData user
-	if err := c.BindJSON(&userData); err != nil {
-		fmt.Println(err.Error())
-	}
-	salt := helper.GenerateSalt()
-	hashed_password, err := helper.EncryptPassword(salt, userData.Password)
-	// err.Error() to get error message
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": err.Error(),
-		})
-	}
-	errDb := model.AddUser(userData.Fullname, userData.Username, userData.Email, salt, hashed_password)
+	errDb := model.AddLink(c.BindJSON)
 	if errDb != nil {
 		c.JSON(http.StatusConflict, gin.H{
 			"message": errDb.Error(),

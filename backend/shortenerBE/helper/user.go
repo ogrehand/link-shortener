@@ -17,6 +17,7 @@ func CheckHash(salt string, password string, hash string) bool {
 	}
 	return hashedPass == hash
 }
+
 func EncryptPassword(salt string, password string) (string, error) {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(salt+password), 14)
 	return string(bytes), err

@@ -3,6 +3,7 @@ package model
 import (
 	"context"
 	"fmt"
+	"shortenerBE/helper"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -22,26 +23,25 @@ type user struct {
 	Email      string    `json:"email" bson:"email,omitempty"`
 	Password   string    `json:"password" bson:"password,omitempty"`
 	Salt       string    `json:"salt" bson:"salt,omitempty"`
-	Created_at time.Time `json:"created_at" bson:"created_at"`
-	Status     bool      `json:"status" bson:"status"`
+	Created_at time.Time `json:"created_at" bson:"created_at,omitempty"`
+	Status     bool      `json:"status" bson:"status,omitempty"`
 	Token      []token   `bson:"token,omitempty"`
 }
 
-func AddUser(full_name string, username string, email string,
-	salt string, hashed_password string) error {
+func AddUser(binder func(any) error) error {
+	var userData user
+	binder(&userData)
+	userData.Salt = helper.GenerateSalt()
+	hashed_password, err := helper.EncryptPassword(userData.Salt, userData.Password)
+	userData.Password = hashed_password
+	userData.Created_at = time.Now()
+	userData.Status = true
+	userData.Token = []token{}
 
 	usersCollection, err := ConnectDB("user")
-	user := bson.D{{"_id", username},
-		{"full_name", full_name},
-		{"email", email},
-		{"salt", salt},
-		{"password", hashed_password},
-		{"created_at", time.Now()},
-		{"status", true},
-		{"token", bson.A{}}}
 	// user := bson.D{{"fullName", "User 1"}, {"age", 30}}
 	// insert the bson object using InsertOne()
-	result, err := usersCollection.InsertOne(context.TODO(), user)
+	result, err := usersCollection.InsertOne(context.TODO(), userData)
 	// check for errors in the insertion
 	if err != nil {
 		fmt.Println(mongo.IsDuplicateKeyError(err))
@@ -110,13 +110,46 @@ func Logout(username string, token string) *mongo.UpdateResult {
 
 func GetUserbyID(username string) (user, error) {
 
-	var userData bson.D
+	var userData user
 
 	usersCollection, err := ConnectDB("user")
 	usersCollection.FindOne(context.TODO(), bson.M{"_id": username}).Decode(&userData)
 
-	jsonUser, _ := bson.Marshal(userData)
-	var userJson user
-	err = bson.Unmarshal(jsonUser, &userJson)
-	return userJson, err
+	return userData, err
+}
+func EditUser(binder func(any) error, id string, delete bool) error {
+	var userData user
+	if binder != nil {
+		binder(&userData)
+	}
+
+	usersCollection, err := ConnectDB("user")
+	if err != nil {
+		fmt.Println(err.Error())
+		return err
+
+	}
+	if delete {
+		userData2 := bson.M{"status": false}
+		result, err := usersCollection.UpdateOne(context.TODO(), bson.M{"_id": id},
+			bson.M{"$set": userData2})
+
+		fmt.Println(result.ModifiedCount)
+		return err
+	}
+
+	result, err := usersCollection.UpdateOne(context.TODO(), bson.M{"_id": id},
+		bson.M{"$set": userData})
+
+	if err != nil {
+		fmt.Println(mongo.IsDuplicateKeyError(err))
+		fmt.Println(err.Error())
+		return err
+
+	}
+	// display the id of the newly inserted object
+	fmt.Println(result)
+	fmt.Println(result.MatchedCount)
+	fmt.Println(result.ModifiedCount)
+	return nil
 }

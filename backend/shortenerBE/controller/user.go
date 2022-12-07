@@ -11,13 +11,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type user struct {
-	Fullname string `json:"fullname"`
-	Username string `json:"username"`
-	Email    string `json:"email"`
-	Password string `json:"password"`
-}
-
 func Hello(name string) (string, error) {
 	if name == "" {
 		return name, errors.New("empty name")
@@ -74,14 +67,12 @@ func Logout(c *gin.Context) {
 }
 
 func GetUserbyID(c *gin.Context) {
-	// c.JSON(http.StatusOK, model.GetUserbyID(c.Param("id")))
+	result, err := model.GetUserbyID(c.Param("id"))
+	fmt.Println(err.Error())
+	c.JSON(http.StatusOK, result)
 }
 
 func Register(c *gin.Context) {
-	var userData user
-	if err := c.BindJSON(&userData); err != nil {
-		fmt.Println(err.Error())
-	}
 	/**
 	best way to print struct instance
 	fmt.Printf("%+v\n", userData)
@@ -91,15 +82,8 @@ func Register(c *gin.Context) {
 	// fmt.Println(string(res2B))
 	// controller.Register("Asdas", "adasdas", "asdasdasd")
 	// fmt.Println("terserah")
-	salt := helper.GenerateSalt()
-	hashed_password, err := helper.EncryptPassword(salt, userData.Password)
 	// err.Error() to get error message
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": err.Error(),
-		})
-	}
-	errDb := model.AddUser(userData.Fullname, userData.Username, userData.Email, salt, hashed_password)
+	errDb := model.AddUser(c.BindJSON)
 	if errDb != nil {
 		c.JSON(http.StatusConflict, gin.H{
 			"message": errDb.Error(),
@@ -110,4 +94,12 @@ func Register(c *gin.Context) {
 		})
 	}
 
+}
+
+func EditUser(c *gin.Context) {
+	model.EditUser(c.BindJSON, c.Param("id"), false)
+}
+
+func DeleteUser(c *gin.Context) {
+	model.EditUser(nil, c.Param("id"), true)
 }
