@@ -30,6 +30,7 @@ type user struct {
 
 func AddUser(binder func(any) error) error {
 	var userData user
+
 	binder(&userData)
 	userData.Salt = helper.GenerateSalt()
 	hashed_password, err := helper.EncryptPassword(userData.Salt, userData.Password)
@@ -54,6 +55,10 @@ func AddUser(binder func(any) error) error {
 	return nil
 }
 
+func PanicSample() {
+	panic("a")
+}
+
 func GetPassSalt(username string) (string, string) {
 	usersCollection, err := ConnectDB("user")
 	if err != nil {
@@ -75,35 +80,33 @@ func GetPassSalt(username string) (string, string) {
 	return saltData.Salt, saltData.Password
 }
 
-func Login(username string, password string, token string) *mongo.UpdateResult {
+func Login(username string, password string, tokenKey string) (*mongo.UpdateResult, time.Time) {
 	usersCollection, err := ConnectDB("user")
 	if err != nil {
-		fmt.Println(err.Error())
-		panic(err.Error())
+		panic(err)
 	}
 	user := bson.M{"_id": username}
-	query := bson.M{"$push": bson.M{"token": bson.D{{"key", token},
-		{"created_at", time.Now()}}}}
+	nowDate := time.Now()
+
+	tokenData := token{tokenKey, nowDate}
+	query := bson.M{"$push": bson.M{"token": tokenData}}
 	result, err2 := usersCollection.UpdateOne(context.TODO(), user, query)
-	fmt.Println(result)
 	if err2 != nil {
-		panic(err2.Error())
+		panic(err2)
 	}
-	return result
+	return result, nowDate
 }
 
 func Logout(username string, token string) *mongo.UpdateResult {
 	usersCollection, err := ConnectDB("user")
 	if err != nil {
-		fmt.Println(err.Error())
-		panic(err.Error())
+		panic(err)
 	}
 	user := bson.M{"_id": username}
 	query := bson.M{"$pull": bson.M{"token": bson.M{"key": token}}}
 	result, err2 := usersCollection.UpdateOne(context.TODO(), user, query)
-	fmt.Println(result)
 	if err2 != nil {
-		panic(err2.Error())
+		panic(err2)
 	}
 	return result
 }

@@ -1,48 +1,27 @@
 package controller
 
 import (
-	"errors"
 	"fmt"
-	"math/rand"
 	"net/http"
 	"shortenerBE/helper"
 	"shortenerBE/model"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 )
 
-func Hello(name string) (string, error) {
-	if name == "" {
-		return name, errors.New("empty name")
-	}
-	// Create a message using a random format.
-	message := fmt.Sprintf(randomFormat(), name)
-	return message, nil
-}
-
-func randomFormat() string {
-	// A slice of message formats.
-	formats := []string{
-		"Hi, %v. Welcome!",
-		"Great to see you, %v!",
-		"Hail, %v! Well met!",
-	}
-
-	// Return one of the message formats selected at random.
-	return formats[rand.Intn(len(formats))]
-}
 func Login(c *gin.Context) {
 	username, existu := c.GetPostForm("username")
 	salt, hash := model.GetPassSalt(username)
 	password, exist := c.GetPostForm("password")
-	fmt.Println("betul ", existu, exist, " salah")
 	if exist && existu {
 		helper.CheckHash(salt, password, hash)
 		token := helper.GenerateToken()
-		result := model.Login(username, hash, token)
+		result, timeData := model.Login(username, hash, token)
 		if result.ModifiedCount == 1 {
 			c.JSON(http.StatusOK, gin.H{
-				"token": token,
+				"token":      token,
+				"created_at": timeData,
 			})
 		}
 	} else {
@@ -55,11 +34,11 @@ func Login(c *gin.Context) {
 
 func Logout(c *gin.Context) {
 	username, existu := c.GetPostForm("username")
-	token := c.Request.Header["Token"]
+	token := strings.Split(c.Request.Header["Authorization"][0], " ")
 
 	fmt.Println(username, existu, token)
 
-	result := model.Logout(username, token[0])
+	result := model.Logout(username, token[1])
 	fmt.Println("sudah keluar sekian ", result.ModifiedCount)
 	c.JSON(http.StatusOK, gin.H{
 		"message": "success",

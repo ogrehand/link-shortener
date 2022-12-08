@@ -13,8 +13,8 @@ services:
     image: ${docker_image_BE}:${docker_tag_BE}
     tty: true 
     restart: unless-stopped
-    # volumes: 
-      # - ./backend/shortenerBE:/usr/bin/shortenerBE
+    volumes: 
+      - ./backend/shortenerBE:/usr/bin/shortenerBE
     ports:
       - 8080:8080
     env_file:
