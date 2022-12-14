@@ -3,6 +3,7 @@ package model
 import (
 	"context"
 	"fmt"
+	"math"
 	"shortenerBE/helper"
 	"time"
 
@@ -27,6 +28,8 @@ type user struct {
 	Status     bool      `json:"status" bson:"status,omitempty"`
 	Token      []token   `bson:"token,omitempty"`
 }
+
+var TokenTTL time.Duration = time.Duration(86400 * math.Pow(10, 9))
 
 func AddUser(binder func(any) error) error {
 	var userData user
@@ -62,7 +65,6 @@ func PanicSample() {
 func GetPassSalt(username string) (string, string) {
 	usersCollection, err := ConnectDB("user")
 	if err != nil {
-		fmt.Println(err.Error())
 		panic(err.Error())
 	}
 	projection := bson.D{{"_id", 0},
@@ -95,6 +97,27 @@ func Login(username string, password string, tokenKey string) (*mongo.UpdateResu
 		panic(err2)
 	}
 	return result, nowDate
+}
+
+func LoginRedis(username string) (string, int) {
+	rdb := ConnectRedis()
+	ctx := context.TODO()
+	token := helper.GenerateToken()
+	err := rdb.SetEX(ctx, token, username, TokenTTL).Err()
+	if err != nil {
+		panic(err)
+	}
+	return token, int(TokenTTL.Seconds())
+}
+
+func LogoutRedis(token string) string {
+	rdb := ConnectRedis()
+	ctx := context.TODO()
+	err := rdb.Del(ctx, token).Err()
+	if err != nil {
+		panic(err)
+	}
+	return "success"
 }
 
 func Logout(username string, token string) *mongo.UpdateResult {

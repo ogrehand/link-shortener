@@ -6,6 +6,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/go-redis/redis/v8"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -26,6 +27,22 @@ func ConnectDB(collection string) (*mongo.Collection, error) {
 	} else {
 		return client.Database(os.Getenv("database")).Collection(collection), nil
 	}
+}
+
+func ConnectRedis() *redis.Client {
+	rdb := redis.NewClient(&redis.Options{
+		Addr:     os.Getenv("redis_host") + ":" + os.Getenv("redis_port"), // use default Addr
+		Password: "",                                                      // no password set
+		DB:       0,                                                       // use default DB
+	})
+	// fmt.Println("bisa jalan")
+	// ctx := context.TODO()
+	// fmt.Println("bisa jalan 1")
+
+	// pong, err := rdb.Ping(ctx).Result()
+	// fmt.Println("bisa jalan 2")
+	// fmt.Println(pong, err)
+	return rdb
 }
 
 func Getdata() {

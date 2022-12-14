@@ -1,7 +1,6 @@
 package helper
 
 import (
-	"fmt"
 	"math/rand"
 	"time"
 
@@ -11,11 +10,12 @@ import (
 const letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"
 
 func CheckHash(salt string, password string, hash string) bool {
-	hashedPass, error := EncryptPassword(salt, password)
-	if error != nil {
-		fmt.Println(error.Error())
+	result := bcrypt.CompareHashAndPassword([]byte(hash), []byte(salt+password))
+	if result == nil {
+		return true
+	} else {
+		return false
 	}
-	return hashedPass == hash
 }
 
 func EncryptPassword(salt string, password string) (string, error) {

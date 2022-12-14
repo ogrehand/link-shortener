@@ -14,34 +14,45 @@ func Login(c *gin.Context) {
 	username, existu := c.GetPostForm("username")
 	salt, hash := model.GetPassSalt(username)
 	password, exist := c.GetPostForm("password")
-	if exist && existu {
-		helper.CheckHash(salt, password, hash)
-		token := helper.GenerateToken()
-		result, timeData := model.Login(username, hash, token)
-		if result.ModifiedCount == 1 {
-			c.JSON(http.StatusOK, gin.H{
-				"token":      token,
-				"created_at": timeData,
-			})
-		}
+
+	if exist && existu && helper.CheckHash(salt, password, hash) {
+		result, timeData := model.LoginRedis(username)
+
+		c.JSON(http.StatusOK, gin.H{
+			"token": result,
+			"TTL":   timeData,
+		})
 	} else {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "username or password empty",
+			"message": "username or password wrong",
 		})
 	}
+
+	// mongo token
+	// if exist && existu {
+	// 	helper.CheckHash(salt, password, hash)
+	// 	token := helper.GenerateToken()
+	// 	result, timeData := model.Login(username, hash, token)
+	// 	if result.ModifiedCount == 1 {
+	// 		c.JSON(http.StatusOK, gin.H{
+	// 			"token":      token,
+	// 			"created_at": timeData,
+	// 		})
+	// 	}
+	// } else {
+	// 	c.JSON(http.StatusBadRequest, gin.H{
+	// 		"message": "username or password empty",
+	// 	})
+	// }
 
 }
 
 func Logout(c *gin.Context) {
-	username, existu := c.GetPostForm("username")
 	token := strings.Split(c.Request.Header["Authorization"][0], " ")
 
-	fmt.Println(username, existu, token)
-
-	result := model.Logout(username, token[1])
-	fmt.Println("sudah keluar sekian ", result.ModifiedCount)
+	result := model.LogoutRedis(token[1])
 	c.JSON(http.StatusOK, gin.H{
-		"message": "success",
+		"message": result,
 	})
 }
 

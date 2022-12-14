@@ -9,6 +9,12 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: ${mongo_pass}
     ports:
       - 27017:27017
+  redis:
+    image: redis:alpine3.17
+    ports:
+      - 6379:6379
+    entrypoint: 'redis-server'
+    # redis-cli to enter redis
   backend:
     image: ${docker_image_BE}:${docker_tag_BE}
     tty: true 
