@@ -1,67 +1,45 @@
 package router
 
-import(
-	"io/ioutil"
-	"log"
+import (
 	"fmt"
+	"shortenerBE/controller"
+	"shortenerBE/model"
+
 	"github.com/gin-gonic/gin"
-	// "net/http"
 )
 
-func RouteV1(router *gin.Engine){
+func RouteV1(router *gin.Engine) {
 	v1 := router.Group("/v1")
 	{
 		users := v1.Group("/users")
 		{
-			users.POST("/login", func(c *gin.Context) {
-				fmt.Println("terserah")
-			})
-			users.POST("/logout", func(c *gin.Context) {
-				fmt.Println("terserah 2")
-			})
-			users.GET("/:id", func(c *gin.Context) {
-				fmt.Println("terserah 3")
-			})
-			users.PUT("/:id", func(c *gin.Context) {
-				fmt.Println("terserah 3")
-			})
-			users.POST("/:id", func(c *gin.Context) {
-				fmt.Println("terserah 3")
-			})
+			users.GET("/:id", controller.GetUserbyID)
+			users.PUT("/", controller.Register)
+			users.POST("/:id", controller.EditUser)
+			users.DELETE("/:id", controller.DeleteUser)
+			users.POST("/login", controller.Login)
+			users.POST("/logout", controller.Logout)
+
 		}
 
 		links := v1.Group("/links")
 		{
-			links.PUT("/", func(c *gin.Context) {
-				fmt.Println("terserah 2")
+			links.PUT("/", controller.AddLink)
+			links.POST("/:id", controller.UpdateLink)
+			links.GET("/:id", controller.GetLink)
+			links.DELETE("/:id", controller.DeleteLink)
+		}
+		dbs := v1.Group("/dbs")
+		{
+			dbs.POST("/:ping", func(c *gin.Context) {
+				model.ConnectRedis()
 			})
-			links.GET("/", func(c *gin.Context) {
-				fmt.Println("terserah 2")
-			})
-			links.POST("/:id", func(c *gin.Context) {
-				fmt.Println("links 1")
-			})
-			links.GET("/:id", func(c *gin.Context) {
-				fmt.Println("terserah 3")
+			dbs.GET("/", func(c *gin.Context) {
+				fmt.Println("router bisa")
+				model.ConnectRedis()
+				fmt.Println("router bisa")
 			})
 		}
 	}
-	// router.GET(":id",func(c *gin.Context){
-	// 	c.Redirect(http.StatusMovedPermanently, "http://www.google.com/")
-	// })
-}
-
-func Terserah(apa string){
-	fmt.Println(apa)
-}
-
-func Router(){
-	files, err := ioutil.ReadDir("./")
-	if err != nil {
-        log.Fatal(err)
-    }
-
-	for _, f := range files {
-		fmt.Println(f.Name())
-	}	
+	router.GET(":id", controller.Redirect)
 }

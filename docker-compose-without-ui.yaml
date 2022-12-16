@@ -9,12 +9,6 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: ${mongo_pass}
     ports:
       - 27017:27017
-  redis:
-    image: redis:alpine3.17
-    ports:
-      - 6379:6379
-    entrypoint: 'redis-server'
-    # redis-cli to enter redis
   backend:
     image: ${docker_image_BE}:${docker_tag_BE}
     tty: true 
@@ -23,13 +17,3 @@ services:
       - ./backend/shortenerBE:/usr/bin/shortenerBE
     ports:
       - 8080:8080
-    env_file:
-      - shared.env
-
-  # frontend:
-  #   image: ${docker_image_FE}:${docker_tag_FE}
-  #   restart: unless-stopped
-  #   volumes: 
-  #     - ./frontend/shortener-fe:/usr/bin/shortener-fe
-  #   ports:
-  #     - 8081:8080

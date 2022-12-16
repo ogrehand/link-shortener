@@ -1,0 +1,28 @@
+user: {
+    _id: username (4-16 string)
+    full_name: full name
+    email: email of the user
+    salt: salt generated random
+    password: hashed password
+    created_at: date when this account created
+    status: status of the user, if inactive user cant login and need to activate again this email
+    token: [
+        {token_key: random char 16,
+        IP/identifier: on progress to find perfect candidate and how to collect this data
+        created_at: will auto destroy on 5 days
+        }
+    ]
+}
+
+link:{
+    _id: setup id/generated one
+    real_link: real link that will be shortened
+    author: id of the author
+    collaborator:[
+        list of collaborator:{
+            id_collaborator: collaborator id
+            collaborator_role: role of the collaborator{editor,viewer}
+        }
+    ]
+    status: status of the link whether its active(can be used) or inactive(cannot be used)
+}
