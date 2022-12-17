@@ -40,3 +40,7 @@ func GenerateToken() string {
 	}
 	return string(b)
 }
+
+func GenerateTokenFake() string {
+	return "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+}

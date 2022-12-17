@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"math"
 	"shortenerBE/helper"
+	"strings"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -102,11 +103,19 @@ func Login(username string, password string, tokenKey string) (*mongo.UpdateResu
 func LoginRedis(username string) (string, int) {
 	rdb := ConnectRedis()
 	ctx := context.TODO()
-	token := helper.GenerateToken()
-	err := rdb.SetEX(ctx, token, username, TokenTTL).Err()
-	if err != nil {
-		panic(err)
+	result := ""
+	token := ""
+	for result != username {
+		fmt.Println(result, token)
+		token = helper.GenerateToken()
+		err := rdb.SetNX(ctx, token, username, TokenTTL).Err()
+		result = strings.Split(rdb.Get(ctx, token).String(), " ")[2]
+		// fmt.Println(strings.Join(result))
+		if err != nil {
+			panic(err)
+		}
 	}
+
 	return token, int(TokenTTL.Seconds())
 }
 
