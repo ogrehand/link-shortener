@@ -8,6 +8,7 @@ import (
 	"net/url"
 	"os"
 	"shortenerBE/helper"
+	"shortenerBE/middleware"
 	"shortenerBE/router"
 
 	"github.com/gin-contrib/static"
@@ -39,6 +40,7 @@ func proxy(c *gin.Context) {
 
 func main() {
 	r := gin.Default()
+	r.Use(middleware.Logger())
 
 	r.Use(static.Serve("/", static.LocalFile("./views", true)))
 	router.RouteV1(r)

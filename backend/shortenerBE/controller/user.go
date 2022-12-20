@@ -73,6 +73,7 @@ func Register(c *gin.Context) {
 	// controller.Register("Asdas", "adasdas", "asdasdasd")
 	// fmt.Println("terserah")
 	// err.Error() to get error message
+	c.Set("key1", "you know who")
 	errDb := model.AddUser(c.BindJSON)
 	if errDb != nil {
 		c.JSON(http.StatusConflict, gin.H{
