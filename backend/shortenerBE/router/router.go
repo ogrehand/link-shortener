@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"reflect"
 	"shortenerBE/controller"
+	"shortenerBE/middleware"
 	"shortenerBE/model"
 
 	"github.com/gin-gonic/gin"
@@ -42,7 +43,7 @@ func RouteV1(router *gin.Engine) {
 			users.POST("/:id", controller.EditUser)
 			users.DELETE("/:id", controller.DeleteUser)
 			users.POST("/login", controller.Login)
-			users.POST("/logout", controller.Logout)
+			users.POST("/logout", controller.Logout, middleware.IsAuth())
 
 		}
 

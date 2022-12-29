@@ -15,11 +15,11 @@ next will add option to add to kafka broker
 */
 type request struct {
 	Header map[string][]string `bson:"header"`
-	Body   string              `bson:"body"`
+	Body   any                 `bson:"body"`
 }
 type response struct {
 	Header map[string][]string `bson:"header"`
-	Body   string              `bson:"body"`
+	Body   any                 `bson:"body"`
 }
 
 type log struct {
@@ -44,6 +44,7 @@ func SaveLog(c *gin.Context, startTime time.Time, endTime time.Time,
 	var bodyData E
 	// var resBody E
 	c.Bind(bodyData)
+	bodyReq, exist := c.Get("body")
 
 	logData := log{ClientAddr: req.RemoteAddr,
 		ReqURI:   req.URL.String(),
@@ -55,6 +56,10 @@ func SaveLog(c *gin.Context, startTime time.Time, endTime time.Time,
 		Log:      logString,
 		Error:    err,
 	}
+	if exist {
+		logData.Request.Body = bodyReq
+	}
+
 	// if &req.Response != nil {
 	// 	var resBody E
 

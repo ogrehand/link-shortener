@@ -23,6 +23,7 @@ services:
       - ./backend/shortenerBE:/usr/bin/shortenerBE
     ports:
       - 8080:8080
+      - 6060:6060
     env_file:
       - shared.env
 

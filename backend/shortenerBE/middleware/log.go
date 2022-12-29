@@ -8,6 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+//https://stackoverflow.com/questions/38501325/how-to-log-response-body-in-gin
 func Logger() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		startTime := time.Now()

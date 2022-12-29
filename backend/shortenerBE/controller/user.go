@@ -49,7 +49,9 @@ func Login(c *gin.Context) {
 
 func Logout(c *gin.Context) {
 	token := strings.Split(c.Request.Header["Authorization"][0], " ")
-
+	c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"Message": "please login"})
+	c.Abort()
+	return
 	result := model.LogoutRedis(token[1])
 	c.JSON(http.StatusOK, gin.H{
 		"message": result,

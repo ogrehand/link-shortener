@@ -129,6 +129,13 @@ func LogoutRedis(token string) string {
 	return "success"
 }
 
+func CheckTokenRedis(token string) (string, error) {
+	rdb := ConnectRedis()
+	ctx := context.TODO()
+	val, err := rdb.Get(ctx, token).Result()
+	return val, err
+}
+
 func Logout(username string, token string) *mongo.UpdateResult {
 	usersCollection, err := ConnectDB("user")
 	if err != nil {
