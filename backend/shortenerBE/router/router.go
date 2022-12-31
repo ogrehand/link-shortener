@@ -38,12 +38,12 @@ func RouteV1(router *gin.Engine) {
 		})
 		users := v1.Group("/users")
 		{
-			users.GET("/:id", controller.GetUserbyID)
+			users.GET("/:id", middleware.IsAuth(), controller.GetUserbyID)
 			users.PUT("/", controller.Register)
-			users.POST("/:id", controller.EditUser)
-			users.DELETE("/:id", controller.DeleteUser)
+			users.POST("/:id", middleware.IsAuth(), controller.EditUser)
+			users.DELETE("/:id", middleware.IsAuth(), controller.DeleteUser)
 			users.POST("/login", controller.Login)
-			users.POST("/logout", controller.Logout, middleware.IsAuth())
+			users.POST("/logout", middleware.IsAuth(), controller.Logout)
 
 		}
 

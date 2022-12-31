@@ -23,8 +23,8 @@ type user struct {
 	Fullname   string    `json:"fullname" bson:"full_name,omitempty"`
 	Username   string    `json:"username" bson:"_id,omitempty"`
 	Email      string    `json:"email" bson:"email,omitempty"`
-	Password   string    `json:"password" bson:"password,omitempty"`
-	Salt       string    `json:"salt" bson:"salt,omitempty"`
+	Password   string    `json:"password,omitempty" bson:"password,omitempty"`
+	Salt       string    `json:"salt,omitempty" bson:"salt,omitempty"`
 	Created_at time.Time `json:"created_at" bson:"created_at,omitempty"`
 	Status     bool      `json:"status" bson:"status,omitempty"`
 	Token      []token   `bson:"token,omitempty"`
@@ -156,6 +156,8 @@ func GetUserbyID(username string) (user, error) {
 
 	usersCollection, err := ConnectDB("user")
 	usersCollection.FindOne(context.TODO(), bson.M{"_id": username}).Decode(&userData)
+	userData.Password = ""
+	userData.Salt = ""
 
 	return userData, err
 }

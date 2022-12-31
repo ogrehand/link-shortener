@@ -49,9 +49,6 @@ func Login(c *gin.Context) {
 
 func Logout(c *gin.Context) {
 	token := strings.Split(c.Request.Header["Authorization"][0], " ")
-	c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"Message": "please login"})
-	c.Abort()
-	return
 	result := model.LogoutRedis(token[1])
 	c.JSON(http.StatusOK, gin.H{
 		"message": result,
@@ -60,7 +57,9 @@ func Logout(c *gin.Context) {
 
 func GetUserbyID(c *gin.Context) {
 	result, err := model.GetUserbyID(c.Param("id"))
-	fmt.Println(err.Error())
+	if err != nil {
+		fmt.Println(err.Error())
+	}
 	c.JSON(http.StatusOK, result)
 }
 
@@ -90,9 +89,15 @@ func Register(c *gin.Context) {
 }
 
 func EditUser(c *gin.Context) {
-	model.EditUser(c.BindJSON, c.Param("id"), false)
+	err := model.EditUser(c.BindJSON, c.Param("id"), false)
+	if err == nil {
+		c.JSON(http.StatusOK, gin.H{"message": "Edt successfully"})
+	}
 }
 
 func DeleteUser(c *gin.Context) {
-	model.EditUser(nil, c.Param("id"), true)
+	err := model.EditUser(nil, c.Param("id"), true)
+	if err == nil {
+		c.JSON(http.StatusOK, gin.H{"message": "Account Deactivated"})
+	}
 }
