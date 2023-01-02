@@ -49,10 +49,10 @@ func RouteV1(router *gin.Engine) {
 
 		links := v1.Group("/links")
 		{
-			links.PUT("/", controller.AddLink)
-			links.POST("/:id", controller.UpdateLink)
-			links.GET("/:id", controller.GetLink)
-			links.DELETE("/:id", controller.DeleteLink)
+			links.PUT("/", middleware.IsAuth(), controller.AddLink)
+			links.POST("/:id", middleware.IsAuth(), controller.UpdateLink)
+			links.GET("/:id", middleware.IsAuth(), controller.GetLink)
+			links.DELETE("/:id", middleware.IsAuth(), controller.DeleteLink)
 		}
 		dbs := v1.Group("/dbs")
 		{
