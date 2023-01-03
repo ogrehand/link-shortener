@@ -4,6 +4,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"shortenerBE/model"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 )
@@ -28,11 +29,21 @@ func Redirect(c *gin.Context) {
 
 func DeleteLink(c *gin.Context) {
 	id := c.Param("id")
+	token := strings.Split(c.Request.Header["Authorization"][0], " ")
+	if user, _ := model.CheckTokenRedis(token[1]); !model.AuthorizeUser(id, user) {
+		c.AbortWithStatusJSON(http.StatusUnauthorized,
+			gin.H{"message": "you have no permission to deactivate this link"})
+	}
 	model.EditLink(nil, id, true)
 }
 
 func UpdateLink(c *gin.Context) {
 	id := c.Param("id")
+	token := strings.Split(c.Request.Header["Authorization"][0], " ")
+	if user, _ := model.CheckTokenRedis(token[1]); !model.AuthorizeUser(id, user) {
+		c.AbortWithStatusJSON(http.StatusUnauthorized,
+			gin.H{"message": "you have no permission to edit this link"})
+	}
 	model.EditLink(c.BindJSON, id, false)
 }
 

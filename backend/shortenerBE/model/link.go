@@ -36,6 +36,26 @@ func GetLink(id string) *Link {
 	return &linkObj
 
 }
+func AuthorizeUser(id string, user_id string) bool {
+
+	linksCollection, err := ConnectDB("link")
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+	var linkObj Link
+
+	linksCollection.FindOne(context.TODO(), bson.M{"_id": id}).Decode(&linkObj)
+	if linkObj.Author == user_id {
+		return true
+	}
+	for _, element := range linkObj.Collaborator {
+		if element.CollaboratorId == user_id {
+			return true
+		}
+	}
+	return false
+
+}
 
 func EditLink(binder func(any) error, shortlink string, delete bool) error {
 	var linkObj Link
