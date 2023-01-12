@@ -10,8 +10,10 @@ import (
 	"shortenerBE/helper"
 	"shortenerBE/middleware"
 	"shortenerBE/router"
+	"time"
 
 	"github.com/gin-contrib/static"
+	"github.com/gin-gonic/contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
@@ -40,7 +42,16 @@ func proxy(c *gin.Context) {
 
 func main() {
 	r := gin.Default()
+	hostname, _ := os.Hostname()
 	r.Use(middleware.Logger())
+	r.Use(cors.New(cors.Config{
+		AllowedOrigins:   []string{"http://" + hostname},
+		AllowedMethods:   []string{"*"},
+		AllowedHeaders:   []string{"Origin"},
+		ExposedHeaders:   []string{"Content-Length"},
+		AllowCredentials: true,
+		MaxAge:           12 * time.Hour,
+	}))
 
 	r.Use(static.Serve("/", static.LocalFile("./views", true)))
 	router.RouteV1(r)
